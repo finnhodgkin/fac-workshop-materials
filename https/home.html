@@ -4,10 +4,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link href='//fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
     <script src="/assets/adapter.js"></script>
+    <script src="/assets/comms.js"></script>
+    <script src="/assets/caller.js"></script>
+    <script src="/assets/driver.js"></script>
     <link rel="stylesheet" href='/assets/grid.css'>
     <link rel="stylesheet" href='/assets/default.css'>
   </head>
-  <body>
-    <h1>Hello.....</h1>
+  <body id='body'>
+    <h1>Hello...</h1>
+    <script>
+      const userMediaPromise = navigator.mediaDevices.getUserMedia({video: true})
+
+      userMediaPromise
+        .then(stream => {
+          const video = document.createElement('video');
+          video.srcObject = stream;
+          video.play();
+          document.querySelector('#body').appendChild(video);
+        }).catch(err => {
+          console.log(err);
+          const errorDiv = document.createElement('div');
+          errorDiv.innerText = 'Can\'t do. Soz.';
+          document.querySelector('#body').appendChild(errorDiv);
+        })
+    </script>
   </body>
 </head>

@@ -20,6 +20,7 @@ const VideoEndPoint = (function() {
       this.log("END POINT RX PROCESSING... ("+from+", "+operation+")", data);
       switch (operation) {
       case 'CALL_REQUEST':
+        this.send(from, 'ACCEPT_CALL', {a: 'HHEEEEEY'});
         break;
       case 'DENIED':
         break;
