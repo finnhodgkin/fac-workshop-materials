@@ -18,6 +18,7 @@ const VideoEndPoint = (function() {
     // Provide the required 'receive' method
     receive(from, operation, data) {
       this.log("END POINT RX PROCESSING... ("+from+", "+operation+")", data);
+      console.log('hi');
       switch (operation) {
       case 'CALL_REQUEST':
         this.send(from, 'ACCEPT_CALL', {a: 'HHEEEEEY'});
