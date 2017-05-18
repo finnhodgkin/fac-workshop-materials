@@ -13,9 +13,10 @@ const VideoEndPoint = (function() {
       this.DOMstate = state;
       this.state = 'IDLE';
       this.inCallWith = null;
-      this.userMediaPromise = navigator.mediaDevices.getUserMedia({ video: true });
-
-      this.attachMedia(videoMe);
+      this.userMediaPromise = navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      setInterval(() => this.pollForEvents(), 2000);
     }
     /**
      * [attachMedia description]
@@ -23,19 +24,20 @@ const VideoEndPoint = (function() {
      * @return {[type]}       [description]
      */
     attachMedia(media) {
-      this.userMediaPromise
-        .then(stream => {
-          media.srcObject = stream;
-          media.play();
-        });
+      this.userMediaPromise.then(stream => {
+        media.srcObject = stream;
+        media.play();
+      });
     }
     /**
      * @method setState
      * @param {String} newState
      */
-    setState(newState){
+    setState(newState) {
       this.DOMstate.innerText = newState;
-      console.log(`state of ${this._name} changed from ${this.state} to ${newState}`);
+      console.log(
+        `state of ${this._name} changed from ${this.state} to ${newState}`
+      );
       this.state = newState;
     }
     /**
@@ -47,69 +49,67 @@ const VideoEndPoint = (function() {
       if (this.state === 'IDLE') {
         this.setState('CALLED');
         this.inCallWith = from;
-        this.send(from, 'ACCEPT_CALL', {a: 'HHEEEEEY'});
+        this.send(from, 'ACCEPT_CALL', { a: 'HHEEEEEY' });
+        this.attachMedia(this.videoMe);
       } else {
-        this.send(from, 'DENIED', {a: 'DENNY (half-orc thorns n stuff)'});
+        this.send(from, 'DENIED', { a: 'DENNY (half-orc thorns n stuff)' });
       }
     }
     acceptCall(from, data) {
       this.setState('CALLER');
       this.inCallWith = from;
-      this.userMediaPromise
-        .then(localStream => {
-          this.peerConnection = new RTCPeerConnection();
+      this.userMediaPromise.then(localStream => {
+        this.peerConnection = new RTCPeerConnection();
 
-          this.peerConnection.onaddstream = (({ stream }) => {
-            this.videoYou.srcObject = stream;
-            this.videoYou.play();
+        this.peerConnection.onaddstream = ({ stream }) => {
+          this.videoYou.srcObject = stream;
+          this.videoYou.play();
+        };
+
+        this.peerConnection.onicecandidate = e => {
+          if (e.candidate) {
+            this.send(from, 'ICE_CANDIDATE', e.candidate);
+          }
+        };
+
+        this.peerConnection.addStream(localStream);
+
+        this.peerConnection
+          .createOffer({ offerToReceiveVideo: 1, offerToReceiveAudio: 0 })
+          .then(offer => {
+            this.peerConnection.setLocalDescription(offer);
+            this.send(from, 'SDP_OFFER', offer);
+            this.attachMedia(this.videoMe);
           });
-
-          this.peerConnection.onicecandidate = ((e) => {
-            if (e.candidate) {
-              this.send(from, 'ICE_CANDIDATE', e.candidate);
-            }
-          });
-
-          this.peerConnection.addStream(localStream);
-
-          this.peerConnection.createOffer({offerToReceiveVideo: 1, offerToReceiveAudio: 0})
-            .then(offer => {
-              this.peerConnection.setLocalDescription(offer);
-              this.send(from, 'SDP_OFFER', offer);
-            });
-
-        });
+      });
     }
     sdpOffer(from, offer) {
-      this.userMediaPromise
-        .then(localStream => {
-          this.peerConnection = new RTCPeerConnection();
+      this.userMediaPromise.then(localStream => {
+        this.peerConnection = new RTCPeerConnection();
 
-          this.peerConnection.onaddstream = (({ stream }) => {
-            this.videoYou.srcObject = stream;
-            this.videoYou.play();
+        this.peerConnection.onaddstream = ({ stream }) => {
+          this.videoYou.srcObject = stream;
+          this.videoYou.play();
+        };
+
+        this.peerConnection.onicecandidate = e => {
+          console.log(e);
+          if (e.candidate) this.send(from, 'ICE_CANDIDATE', e.candidate);
+        };
+
+        this.peerConnection.addStream(localStream);
+
+        this.peerConnection.setRemoteDescription(offer).then(() => {
+          this.peerConnection.createAnswer().then(answer => {
+            this.peerConnection.setLocalDescription(answer);
+            this.send(from, 'SDP_ANSWER', answer);
           });
-
-          this.peerConnection.onicecandidate = ((e) => {
-            console.log(e);
-            // if (e.candidate)
-            this.send(from, 'ICE_CANDIDATE', e.candidate);
-          });
-
-          this.peerConnection.addStream(localStream);
-
-          this.peerConnection.setRemoteDescription(offer)
-            .then(() => {
-              this.peerConnection.createAnswer()
-              .then(answer => {
-                this.peerConnection.setLocalDescription(answer);
-                this.send(from, 'SDP_ANSWER', answer);
-              });
-            });
         });
+      });
     }
     sdpAnswer(from, offer) {
-      this.peerConnection.setRemoteDescription(offer)
+      this.peerConnection
+        .setRemoteDescription(offer)
         .then(() => this.log('SET REMOTE ON BOTH SIDES'));
     }
     iceCandidate(from, data) {
@@ -122,6 +122,8 @@ const VideoEndPoint = (function() {
       this.setState('IDLE');
       this.inCallWith = null;
       this.peerConnection.close();
+      delete this.peerConnection;
+      this.videoMe.srcObject = null;
     }
     denied(from, data) {
       this.setState('IDLE');
@@ -137,28 +139,40 @@ const VideoEndPoint = (function() {
     receive(from, operation, data) {
       this.log(`END POINT RX PROCESSING... ("${from}", "${operation}")`, data);
       switch (operation) {
-      case 'CALL_REQUEST':
-        this.callRequest(from, data);
-        break;
-      case 'DENIED':
-        this.denied(from, data);
-        break;
-      case 'ACCEPT_CALL':
-        this.acceptCall(from, data);
-        break;
-      case 'SDP_OFFER':
-        this.sdpOffer(from, data);
-        break;
-      case 'SDP_ANSWER':
-        this.sdpAnswer(from, data);
-        break;
-      case 'ICE_CANDIDATE':
-        this.iceCandidate(from, data);
-        break;
-      case 'END_CALL':
-        this.endCall(from, data);
-        break;
+        case 'CALL_REQUEST':
+          this.callRequest(from, data);
+          break;
+        case 'DENIED':
+          this.denied(from, data);
+          break;
+        case 'ACCEPT_CALL':
+          this.acceptCall(from, data);
+          break;
+        case 'SDP_OFFER':
+          this.sdpOffer(from, data);
+          break;
+        case 'SDP_ANSWER':
+          this.sdpAnswer(from, data);
+          break;
+        case 'ICE_CANDIDATE':
+          this.iceCandidate(from, data);
+          break;
+        case 'END_CALL':
+          this.endCall(from, data);
+          break;
       }
+    }
+
+    pollForEvents() {
+      const url = `/poll/${this._name}`;
+      console.log(url);
+      fetch(url).then(res => res.json()).then(json => {
+        const messageArray = json.messages;
+        messageArray.forEach(message => {
+          console.log(message);
+          this.receive(message.from, message.method, JSON.parse(message.data));
+        });
+      });
     }
     /** @method hangupCall
      *  @description The localEndPoint (THIS) wants to terminate the call. This is generally the result of the user
@@ -167,9 +181,11 @@ const VideoEndPoint = (function() {
     hangUpCall() {
       if (this.inCallWith) {
         this.setState('IDLE');
-        this.send(this.inCallWith, 'END_CALL', {a: 'END IT ALL!'});
+        this.send(this.inCallWith, 'END_CALL', { a: 'END IT ALL!' });
         this.inCallWith = null;
         this.peerConnection.close();
+        delete this.peerConnection;
+        this.videoMe.srcObject = null;
       }
     }
     /** @method startCall
@@ -184,7 +200,7 @@ const VideoEndPoint = (function() {
     startCall(target) {
       if (this.state === 'IDLE' && target !== this._name) {
         this.setState('RINGING');
-        this.send(target, 'CALL_REQUEST', {a: "i am some data"});
+        this.send(target, 'CALL_REQUEST', { a: 'i am some data' });
       }
     }
   }

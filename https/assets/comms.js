@@ -1,6 +1,5 @@
 /* global document */
-const EndPoint =
-(function() {
+const EndPoint = (function() {
   /** @class EndPoint @virtual
    *  @description Virtual base communications class. Inherit this into a specific implementation. The
    *  base class implements the underlying comms. Derived classes must override the 'receive' method.
@@ -10,6 +9,7 @@ const EndPoint =
    */
   class EndPoint {
     constructor(ep_name) {
+      console.log('super: ', ep_name);
       this._name = ep_name;
       EndPoint.names[ep_name] = this;
     }
@@ -17,7 +17,7 @@ const EndPoint =
      *  @description simple wrapper around console.log that prefixes the name ofthe EndPoint that's generating the message
      */
     log(...args) {
-      console.log('NAME: '+this._name,...args);
+      console.log('NAME: ' + this._name, ...args);
     }
     /** @method send
      *  @description Send a message to the named target EndPoint (which is usually on a remote client)
@@ -27,8 +27,14 @@ const EndPoint =
      */
     send(targetName, operation, data) {
       //@TODO check exists
-      if(EndPoint.names[targetName] && targetName !== this._name){
-        EndPoint.names[targetName].receive(this._name, operation, data);
+      if (targetName !== this._name) {
+        fetch(
+          `https://localhost:8000/send/${this._name}/${targetName}/${operation}`,
+          {
+            method: 'POST',
+            body: JSON.stringify(data),
+          }
+        );
       }
     }
     /** @method receive
@@ -36,9 +42,10 @@ const EndPoint =
      *  derived class. The child class method will take the following parameters:
      */
     receive(/* fromName, operation, data */) {
-      console.error("Virtual base class method 'receive' called - this should always be overridden in a derived class");
+      console.error(
+        "Virtual base class method 'receive' called - this should always be overridden in a derived class"
+      );
     }
-
   }
   EndPoint.names = {};
 

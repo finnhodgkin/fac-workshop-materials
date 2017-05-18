@@ -1,4 +1,6 @@
 /**** Hapi Route Handler for the presenter (/present.html) ****/
+// Want the directory
+const Directory = require('./directory.js');
 const fs = require('fs');
 
 module.exports = {
@@ -7,9 +9,9 @@ module.exports = {
   handler: (request, reply) => {
     // console.log("REQ: ",request);
     // Return static home page.
-    if (fs.existsSync('./home.html')) {
+    if (fs.existsSync('home.html')) {
       reply.writeHead(200, {"Content-Type": "text/html"});
-      fs.createReadStream('./home.html').pipe(reply);
+      fs.createReadStream('home.html').pipe(reply);
     }
   }
 };

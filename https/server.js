@@ -11,17 +11,19 @@ const options = {
 const routes = [
   require('./assets.js'),
   require('./home.js'),
+  require('./poll.js'),
+  require('./send.js')
 ];
 
 var rootDir = (__dirname).replace(/^.*\//,'');
 process.chdir(__dirname);
 console.log("ROOT DIR: "+__dirname);
 function decodePath(req) {
-  return (req.url||'/').replace(/^.\:\d+/,'').replace(/\?.*$/,'');
+  return (req.url||'/').replace(/^.:\d+/,'').replace(/\?.*$/,'');
 }
 function processRequest(req, res, method, path, payload) {
   // Split the path into fragments and look for a matching element.
-  var pathParts = path.replace(/^\/(\:\d+)?|\/$/g,'').split(/\//g);
+  var pathParts = path.replace(/^\/(:\d+)?|\/$/g,'').split(/\//g);
 
   method = method.toUpperCase();
   res.statusCode = 404;
@@ -46,7 +48,7 @@ function processRequest(req, res, method, path, payload) {
         r.handler(req, res);
         return true;
       }
-    };
+    }
     return false;
   });
   if (res.statusCode==404) {
@@ -56,7 +58,7 @@ function processRequest(req, res, method, path, payload) {
   }
 }
 
-var paramRegexp = /^\{([\w\_\-\$]+)\}$/;
+var paramRegexp = /^\{([\w_\-\$]+)\}$/;
 function prepareRoutes() {
   // Once only pass through the 'routes' array to make it more usable.
   routes.forEach((r) => {

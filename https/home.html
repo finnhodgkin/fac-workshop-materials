@@ -6,11 +6,11 @@
     <script src="/assets/adapter.js"></script>
     <script src="/assets/comms.js"></script>
     <script src="/assets/caller.js"></script>
-    <script src="/assets/driver.js"></script>
     <link rel="stylesheet" href='/assets/grid.css'>
     <link rel="stylesheet" href='/assets/default.css'>
   </head>
   <body id='body'>
+    <div id="name-thing"><input id="name-field" placeholder="name..."> <button id="your-name">Submit</button></div>
     <main class="container">
       <section class="caller" id="V1">
         <button class="button pause">pause</button>
@@ -21,49 +21,23 @@
         <video class="video"></video>
         <video class="video video--me"></video>
       </section>
-      <section class="caller" id="V2">
-        <button class="button pause">pause</button>
-        <input class="calltarget" type="text" placeholder="Caller id..."></input>
-        <button class="button hangup">hang up</button>
-        <button class="button call">call</button>
-        <div class="state">IDLE</div>
-        <video class="video"></video>
-        <video class="video video--me"></video>
-      </section>
-      <section class="caller" id="V3">
-        <button class="button pause">pause</button>
-        <input class="calltarget" type="text" placeholder="Caller id..."></input>
-        <button class="button hangup">hang up</button>
-        <button class="button call">call</button>
-        <div class="state">IDLE</div>
-        <video class="video"></video>
-        <video class="video video--me"></video>
-      </section>
-      <section class="caller" id="V4">
-        <button class="button pause">pause</button>
-        <input class="calltarget" type="text" placeholder="Caller id..."></input>
-        <button class="button hangup">hang up</button>
-        <button class="button call">call</button>
-        <div class="state">IDLE</div>
-        <video class="video"></video>
-        <video class="video video--me"></video>
-      </section>
     </main>
     <script>
-      // const userMediaPromise = navigator.mediaDevices.getUserMedia({video: true})
-      //
-      // userMediaPromise
-      //   .then(stream => {
-      //     const video = document.createElement('video');
-      //     video.srcObject = stream;
-      //     video.play();
-      //     document.querySelector('#body').appendChild(video);
-      //   }).catch(err => {
-      //     console.log(err);
-      //     const errorDiv = document.createElement('div');
-      //     errorDiv.innerText = 'Can\'t do. Soz.';
-      //     document.querySelector('#body').appendChild(errorDiv);
-      //   })
-    </script>
+    // const userMediaPromise = navigator.mediaDevices.getUserMedia({video: true})
+//
+// userMediaPromise
+//   .then(stream => {
+//     const video = document.createElement('video');
+//     video.srcObject = stream;
+//     video.play();
+//     document.querySelector('#body').appendChild(video);
+//   }).catch(err => {
+//     console.log(err);
+//     const errorDiv = document.createElement('div');
+//     errorDiv.innerText = 'Can\'t do. Soz.';
+//     document.querySelector('#body').appendChild(errorDiv);
+//   })
+</script>
+<script src="/assets/driver.js"></script>
   </body>
 </head>

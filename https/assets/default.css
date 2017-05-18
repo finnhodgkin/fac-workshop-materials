@@ -34,6 +34,7 @@ body {
 .container {
   font-size: 0;
   width: 100%;
+  display: none;
 }
 
 .caller {
