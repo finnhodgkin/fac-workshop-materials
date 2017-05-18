@@ -27,7 +27,7 @@ const EndPoint =
      */
     send(targetName, operation, data) {
       //@TODO check exists
-      if(EndPoint.names[targetName]){
+      if(EndPoint.names[targetName] && targetName !== this._name){
         EndPoint.names[targetName].receive(this._name, operation, data);
       }
     }

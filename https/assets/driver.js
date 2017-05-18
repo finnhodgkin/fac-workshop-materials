@@ -2,9 +2,29 @@
 (function() {
   document.addEventListener("DOMContentLoaded", function() {
     // Application logic here
-    const V1 = new VideoEndPoint('V1');
-    const V2 = new VideoEndPoint('V2');
-    V1.send('V2', 'CALL_REQUEST', {a: 'hhi frenz'});
+    const allTheEndpoints = {};
+    document.querySelectorAll('.caller').forEach((e) => {
+      const videoId = e.id;
+      const videoYou = e.querySelector('.video');
+      const videoMe = e.querySelector('.video--me');
+      const videoState = e.querySelector('.state');
+      allTheEndpoints[videoId] = new VideoEndPoint(videoId, videoYou, videoMe, videoState);
+    });
+
+    document.querySelectorAll(".call").forEach((e) => {
+      e.addEventListener('click', () => {
+        const callerId = e.parentNode.id;
+        const target = e.parentNode.querySelector('input').value;
+        allTheEndpoints[callerId].startCall(target);
+      });
+    });
+
+    document.querySelectorAll(".hangup").forEach((e) => {
+      e.addEventListener('click', () => {
+        const callerId = e.parentNode.id;
+        allTheEndpoints[callerId].hangUpCall();
+      });
+    });
 
   });
 })();

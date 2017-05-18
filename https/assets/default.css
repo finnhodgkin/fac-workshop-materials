@@ -31,8 +31,51 @@ body {
   display:none
 }
 
-video.video {width:100%;height:auto;border:1px solid #c0c0c0}
-video.self {width:100px;height:auto;border:1px solid #c0c0c0;position:relative;bottom:10px;right:-10px}
+.container {
+  font-size: 0;
+  width: 100%;
+}
+
+.caller {
+  height: auto;
+  width: 50%;
+  display: inline-block;
+  padding: .5% 1%;
+  box-sizing: border-box;
+  font-size: 1rem;
+  position: relative;
+}
+
+.calltarget {
+  width: 50%;
+  padding: 5px;
+}
+
+.state {
+  display: inline-block;
+  color: palevioletred;
+}
+
+.button {
+  padding: 5px;
+  background: none;
+  border: 1px solid palevioletred;
+  border-radius: 6px;
+}
+
+.video {
+  width: 100%;
+  border: 1px solid palevioletred;
+}
+
+.video--me {
+  background-color: white;
+  width: 30%;
+  border: 1px solid rebeccapurple;
+  position: absolute;
+  bottom: 3%;
+  left: 3%;
+}
 
 
 form .message {color:#ff0000; font-weight:bold;text-align:center}
@@ -52,19 +95,3 @@ form .message {color:#ff0000; font-weight:bold;text-align:center}
   background-color: #c0c0c0;
   box-shadow: 2px 2px 5px #ccc
 }
-input[type="text"], input[type="password"], input[type="email"] {
-  font-size:24px;
-  width: 100%;
-  padding:5px;
-  border:1px solid #e0e0e0;
-  border-radius:5px;
-  outline:0;
-}
-input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
-}
-
-input[type="text"].error, input[type="password"].error {
-  border:1px solid red;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(255,102,0,.6)
-}
-input[type="text"].error {border:1px solid red; shadow: 5px 5px}
